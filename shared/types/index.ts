@@ -8,6 +8,22 @@ export interface Address {
   isDefault: boolean;
 }
 
+export interface WalletTransaction {
+  _id?: string;
+  amount: number;
+  type: 'credit' | 'debit';
+  description: string;
+  timestamp: string;
+}
+
+export interface TokenTransaction {
+  _id?: string;
+  amount: number;
+  type: 'earn' | 'redeem';
+  description: string;
+  timestamp: string;
+}
+
 export interface User {
   _id: string;
   name: string;
@@ -15,6 +31,11 @@ export interface User {
   role: 'user' | 'admin';
   isVerified: boolean;
   addresses: Address[];
+  walletBalance: number;
+  tokensAvailable: number;
+  tokensLifetime: number;
+  walletTransactions?: WalletTransaction[];
+  tokenTransactions?: TokenTransaction[];
   createdAt?: string;
 }
 
@@ -84,6 +105,7 @@ export interface Order {
   subtotal: number;
   couponApplied?: string | Coupon;
   discountAmount: number;
+  tokensRedeemed?: number;
   total: number;
   invoicePath?: string;
   trackingHistory: TrackingStep[];

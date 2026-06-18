@@ -15,20 +15,9 @@ import {
   ArcElement
 } from 'chart.js';
 import { 
-  LayoutDashboard, 
-  ShoppingCart, 
-  Users, 
-  Package, 
-  AlertTriangle, 
-  Plus, 
-  ListFilter, 
-  RefreshCw, 
-  Sparkles, 
-  DollarSign, 
-  FileSpreadsheet, 
-  PlusCircle, 
-  BrainCircuit,
-  Loader2
+  LayoutDashboard, ShoppingCart, Users, Package, AlertTriangle, 
+  Plus, ListFilter, RefreshCw, Sparkles, DollarSign, FileSpreadsheet, 
+  PlusCircle, BrainCircuit, Loader2, Coins, Wallet, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,7 +47,11 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<StatData | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [usersList, setUsersList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Active sub-tab state
+  const [activeTab, setActiveTab] = useState<'metrics' | 'orders' | 'catalog' | 'users' | 'insights'>('metrics');
 
   // AI Insights states
   const [aiInsights, setAiInsights] = useState<string>('');
@@ -79,7 +72,14 @@ export default function AdminDashboardPage() {
   const [newProdImg, setNewProdImg] = useState('');
   const [prodMsg, setProdMsg] = useState('');
 
-  const [activeTab, setActiveTab] = useState<'metrics' | 'orders' | 'catalog' | 'insights'>('metrics');
+  // Wallet and Token adjustments states
+  const [showAdjustModal, setShowAdjustModal] = useState(false);
+  const [selectedAdjustUser, setSelectedAdjustUser] = useState<any | null>(null);
+  const [adjustField, setAdjustField] = useState<'wallet' | 'tokens'>('wallet');
+  const [adjustType, setAdjustType] = useState<'credit' | 'debit'>('credit');
+  const [adjustAmount, setAdjustAmount] = useState('');
+  const [adjustDesc, setAdjustDesc] = useState('');
+  const [adjustLoading, setAdjustLoading] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -95,6 +95,11 @@ export default function AdminDashboardPage() {
         if (catRes.data.categories.length > 0) {
           setNewProdCat(catRes.data.categories[0]._id);
         }
+      }
+
+      const usersRes = await API.get('/admin/users');
+      if (usersRes.data.success) {
+        setUsersList(usersRes.data.users);
       }
     } catch (error) {
       console.error('Failed to load admin dashboard:', error);
@@ -190,6 +195,32 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleAdjustSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedAdjustUser || !adjustAmount || Number(adjustAmount) <= 0) return;
+    setAdjustLoading(true);
+    try {
+      const { data } = await API.post('/admin/wallet-tokens', {
+        userId: selectedAdjustUser._id,
+        field: adjustField,
+        type: adjustType,
+        amount: Number(adjustAmount),
+        description: adjustDesc || `Admin manual adjustment (${adjustType} ${adjustField})`
+      });
+      if (data.success) {
+        alert(data.message || 'Adjusted successfully!');
+        setShowAdjustModal(false);
+        setAdjustAmount('');
+        setAdjustDesc('');
+        fetchDashboardData();
+      }
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Adjustment failed.');
+    } finally {
+      setAdjustLoading(false);
+    }
+  };
+
   if (!token || user?.role !== 'admin') {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center space-y-4">
@@ -216,7 +247,6 @@ export default function AdminDashboardPage() {
     );
   }
 
-  // Set up chart data configurations
   const categorySalesData = {
     labels: stats.categorySales.map(item => item.categoryName),
     datasets: [
@@ -224,17 +254,12 @@ export default function AdminDashboardPage() {
         label: 'Gross Revenues (INR)',
         data: stats.categorySales.map(item => item.revenue),
         backgroundColor: [
-          'rgba(37, 99, 235, 0.7)',  // Primary Blue
-          'rgba(124, 58, 237, 0.7)', // Secondary Purple
-          'rgba(16, 185, 129, 0.7)', // Success Emerald
-          'rgba(239, 68, 68, 0.7)'    // Sale Badge Red
+          'rgba(37, 99, 235, 0.7)',
+          'rgba(124, 58, 237, 0.7)',
+          'rgba(16, 185, 129, 0.7)',
+          'rgba(239, 68, 68, 0.7)'
         ],
-        borderColor: [
-          '#2563EB',
-          '#7C3AED',
-          '#10B981',
-          '#EF4444'
-        ],
+        borderColor: ['#2563EB', '#7C3AED', '#10B981', '#EF4444'],
         borderWidth: 1.5
       }
     ]
@@ -265,7 +290,7 @@ export default function AdminDashboardPage() {
             Admin Control Console
           </h1>
           <p className="text-xs text-text-secondary dark:text-slate-400 mt-1 font-medium">
-            Monitor transaction records, manage catalogs, analyze logistics, and get AI business advice.
+            Monitor transaction records, manage catalogs, adjust wallets/tokens, and get AI business advice.
           </p>
         </div>
 
@@ -275,6 +300,7 @@ export default function AdminDashboardPage() {
             { id: 'metrics', label: 'Metrics Board', icon: LayoutDashboard },
             { id: 'orders', label: 'Orders List', icon: ShoppingCart },
             { id: 'catalog', label: 'Catalog CRUD', icon: Package },
+            { id: 'users', label: 'User Balances', icon: Users },
             { id: 'insights', label: 'Gemini Insights', icon: BrainCircuit }
           ].map((tab) => {
             const TabIcon = tab.icon;
@@ -307,7 +333,6 @@ export default function AdminDashboardPage() {
           {/* TAB 1: METRICS BOARD */}
           {activeTab === 'metrics' && (
             <div className="space-y-8">
-              {/* Stats Counters */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 {[
                   { icon: DollarSign, title: 'Gross Revenue', value: `₹${stats.totalRevenue.toLocaleString()}`, color: 'text-emerald-500' },
@@ -327,7 +352,6 @@ export default function AdminDashboardPage() {
                 ))}
               </div>
 
-              {/* Low Stock Warning Alert Panel */}
               {stats.lowStockProducts.length > 0 && (
                 <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 rounded-3xl p-6 space-y-4 shadow-sm">
                   <span className="text-xs font-black uppercase tracking-wider flex items-center gap-1.5 font-poppins">
@@ -335,23 +359,21 @@ export default function AdminDashboardPage() {
                     Stock Depletion Warnings (Critical Lows)
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {stats.lowStockProducts.map((prod, idx) => (
-                      <Link 
-                        href={`/products/${prod.slug}`} 
+                    {stats.lowStockProducts.slice(0, 3).map((prod, idx) => (
+                      <div 
                         key={idx} 
-                        className="bg-white dark:bg-slate-950/40 border border-rose-200/50 dark:border-rose-500/10 p-4 rounded-2xl flex justify-between items-center text-xs hover:border-rose-400 transition-colors"
+                        className="bg-white dark:bg-slate-950/40 border border-rose-200/50 dark:border-rose-500/10 p-4 rounded-2xl flex justify-between items-center text-xs"
                       >
                         <span className="truncate max-w-[150px] font-bold text-text-primary dark:text-slate-200">{prod.name}</span>
                         <span className="bg-rose-500 text-white font-black px-2.5 py-1 rounded-lg text-[9px] uppercase tracking-wider">
                           {prod.inventory} Available
                         </span>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Charts Display grids */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-xs">
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 space-y-4 shadow-sm">
                   <h3 className="font-black text-text-primary dark:text-white text-sm uppercase tracking-widest font-poppins">
@@ -455,7 +477,6 @@ export default function AdminDashboardPage() {
           {/* TAB 3: CATALOG CRUD */}
           {activeTab === 'catalog' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
-              {/* Create Category */}
               <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm space-y-4">
                 <h3 className="font-black text-text-primary dark:text-white text-sm border-b border-slate-100 dark:border-white/5 pb-3 flex items-center gap-1.5 uppercase tracking-widest font-poppins">
                   <PlusCircle className="w-5 h-5 text-primary" />
@@ -491,7 +512,7 @@ export default function AdminDashboardPage() {
                       rows={3}
                       value={newCatDesc}
                       onChange={(e) => setNewCatDesc(e.target.value)}
-                      placeholder="e.g. Premium orthopaedic support seating products..."
+                      placeholder="e.g. Premium support products..."
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-text-primary dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
@@ -516,7 +537,6 @@ export default function AdminDashboardPage() {
                 </form>
               </div>
 
-              {/* Create Product */}
               <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm space-y-4">
                 <h3 className="font-black text-text-primary dark:text-white text-sm border-b border-slate-100 dark:border-white/5 pb-3 flex items-center gap-1.5 uppercase tracking-widest font-poppins">
                   <PlusCircle className="w-5 h-5 text-primary" />
@@ -552,7 +572,7 @@ export default function AdminDashboardPage() {
                       rows={2}
                       value={newProdDesc}
                       onChange={(e) => setNewProdDesc(e.target.value)}
-                      placeholder="e.g. Full automatic chronograph with details..."
+                      placeholder="e.g. Full automatic chronograph..."
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-text-primary dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
@@ -615,7 +635,57 @@ export default function AdminDashboardPage() {
             </div>
           )}
 
-          {/* TAB 4: GEMINI AI INSIGHTS */}
+          {/* TAB 4: USER WALLETS & TOKENS MANAGEMENT */}
+          {activeTab === 'users' && (
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-slate-100 dark:border-white/5">
+                <h3 className="text-sm font-black text-text-primary dark:text-white uppercase tracking-widest font-poppins">
+                  User Accounts, Wallets & Loyalty Tokens
+                </h3>
+              </div>
+              <div className="overflow-x-auto text-xs">
+                <table className="w-full text-left border-collapse min-w-[700px]">
+                  <thead>
+                    <tr className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200/60 dark:border-white/5 text-slate-500 uppercase tracking-widest text-[9px] font-black">
+                      <th className="p-4.5">User Details</th>
+                      <th className="p-4.5">Role</th>
+                      <th className="p-4.5">Wallet Balance</th>
+                      <th className="p-4.5">Available Tokens</th>
+                      <th className="p-4.5">Lifetime Tokens</th>
+                      <th className="p-4.5 text-center">Management Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {usersList.map((usr) => (
+                      <tr key={usr._id} className="border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-slate-50/50 dark:hover:bg-slate-950/20 text-text-secondary dark:text-slate-300 font-semibold transition-colors">
+                        <td className="p-4.5">
+                          <span className="block text-text-primary dark:text-white font-bold">{usr.name}</span>
+                          <span className="text-[10px] text-slate-500">{usr.email}</span>
+                        </td>
+                        <td className="p-4.5 capitalize">{usr.role}</td>
+                        <td className="p-4.5 font-bold text-text-primary dark:text-white">₹{(usr.walletBalance || 0).toLocaleString()}</td>
+                        <td className="p-4.5 font-bold text-text-primary dark:text-white">{usr.tokensAvailable || 0} SET</td>
+                        <td className="p-4.5 font-bold text-text-primary dark:text-white">{usr.tokensLifetime || 0} SET</td>
+                        <td className="p-4.5 text-center">
+                          <button
+                            onClick={() => {
+                              setSelectedAdjustUser(usr);
+                              setShowAdjustModal(true);
+                            }}
+                            className="px-3 py-1.5 bg-primary/10 text-primary dark:text-white rounded-lg hover:bg-primary/20 transition-all font-bold text-[10px]"
+                          >
+                            Adjust Balances
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: GEMINI AI INSIGHTS */}
           {activeTab === 'insights' && (
             <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200/60 dark:border-white/5 shadow-sm space-y-6">
               
@@ -678,6 +748,86 @@ export default function AdminDashboardPage() {
           )}
         </motion.div>
       </AnimatePresence>
+
+      {/* Wallet / Token Adjustment Modal */}
+      {showAdjustModal && selectedAdjustUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/50 dark:border-white/5 max-w-sm w-full space-y-5 mx-4">
+            <div>
+              <h3 className="font-black text-lg text-text-primary dark:text-white">Adjust Account Balances</h3>
+              <p className="text-[11px] text-text-secondary dark:text-slate-400 mt-1">Adjust balance logs for user: <strong>{selectedAdjustUser.name}</strong></p>
+            </div>
+
+            <form onSubmit={handleAdjustSubmit} className="space-y-4 text-xs font-semibold">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Target Field</label>
+                  <select
+                    value={adjustField}
+                    onChange={(e) => setAdjustField(e.target.value as any)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-white/5 rounded-xl px-3 py-2 text-xs text-text-primary dark:text-white"
+                  >
+                    <option value="wallet">Wallet Balance</option>
+                    <option value="tokens">Loyalty Tokens</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Action Type</label>
+                  <select
+                    value={adjustType}
+                    onChange={(e) => setAdjustType(e.target.value as any)}
+                    className="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-white/5 rounded-xl px-3 py-2 text-xs text-text-primary dark:text-white"
+                  >
+                    <option value="credit">Credit (Add)</option>
+                    <option value="debit">Debit (Deduct)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Amount</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="e.g. 500"
+                  value={adjustAmount}
+                  onChange={(e) => setAdjustAmount(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-white/5 rounded-xl px-3.5 py-2.5 text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Reason / Description</label>
+                <input
+                  type="text"
+                  placeholder="Manual credit adjustment"
+                  value={adjustDesc}
+                  onChange={(e) => setAdjustDesc(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-slate-800 border border-transparent dark:border-white/5 rounded-xl px-3.5 py-2.5 text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAdjustModal(false)}
+                  className="flex-1 py-3 border border-slate-200 dark:border-white/10 rounded-xl font-bold text-text-secondary dark:text-slate-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={adjustLoading}
+                  className="flex-1 py-3 bg-primary hover:bg-blue-600 text-white rounded-xl font-bold shadow-md flex items-center justify-center gap-1.5"
+                >
+                  {adjustLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Apply Adjustments'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
     </div>
   );

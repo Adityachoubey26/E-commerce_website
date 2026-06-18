@@ -8,6 +8,7 @@ import connectDB from './config/db.js';
 import apiRoutes from './routes/api.js';
 import { Category, Product, Coupon, User } from './models/Schemas.js';
 import bcrypt from 'bcryptjs';
+import { categoriesData, generateProducts } from './config/seedData.js';
 
 dotenv.config();
 
@@ -47,122 +48,63 @@ app.use((err, req, res, next) => {
 // --- Auto-Database Seeding ---
 const seedDatabase = async () => {
   try {
-    const categoryCount = await Category.countDocuments({});
-    if (categoryCount === 0) {
-      console.log('Seeding initial categories, products, coupons and default admin...');
+    const productCount = await Product.countDocuments({});
+    if (productCount < 100) {
+      console.log('Seeding initial categories, products, coupons and default admin for ShopEra...');
 
-      // 1. Create Default Categories
-      const catAudio = await Category.create({
-        name: 'Premium Audio',
-        slug: 'premium-audio',
-        description: 'Noise-cancelling headphones and immersive acoustic gear.',
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=400'
-      });
+      // Clear existing to avoid duplicates when database schema changes
+      await Product.deleteMany({});
+      await Category.deleteMany({});
+      await Coupon.deleteMany({});
+      
+      // Keep admin if exists, or create if not
+      const adminExists = await User.findOne({ role: 'admin' });
+      if (!adminExists) {
+        const hashedAdminPassword = await bcrypt.hash('admin123', 10);
+        await User.create({
+          name: 'Admin Portfolio User',
+          email: 'admin@glassshop.com',
+          password: hashedAdminPassword,
+          role: 'admin',
+          isVerified: true,
+          walletBalance: 5000,
+          tokensAvailable: 100,
+          tokensLifetime: 100
+        });
+        console.log('Created Default Admin: admin@glassshop.com / admin123');
+      }
 
-      const catWatches = await Category.create({
-        name: 'Smart Watches',
-        slug: 'smart-watches',
-        description: 'Elite wearable micro-consoles and chronographs.',
-        image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=400'
-      });
+      // Also create a default user demo account if not exists
+      const userExists = await User.findOne({ email: 'user@glassshop.com' });
+      if (!userExists) {
+        const hashedUserPassword = await bcrypt.hash('user123', 10);
+        await User.create({
+          name: 'Demo ShopEra User',
+          email: 'user@glassshop.com',
+          password: hashedUserPassword,
+          role: 'user',
+          isVerified: true,
+          walletBalance: 5000,
+          tokensAvailable: 100,
+          tokensLifetime: 100
+        });
+        console.log('Created Default User: user@glassshop.com / user123');
+      }
 
-      const catGear = await Category.create({
-        name: 'Minimalist Accessories',
-        slug: 'minimalist-accessories',
-        description: 'Sleek items designed for modern productivity.',
-        image: 'https://images.unsplash.com/photo-1527814050087-379526332c8e?auto=format&fit=crop&q=80&w=400'
-      });
+      // 1. Create Categories
+      const categoryMap = {};
+      for (const cat of categoriesData) {
+        const createdCat = await Category.create(cat);
+        categoryMap[cat.slug] = createdCat._id;
+      }
+      console.log('Categories seeded successfully.');
 
-      // 2. Create Default Admin
-      const hashedAdminPassword = await bcrypt.hash('admin123', 10);
-      await User.create({
-        name: 'Admin Portfolio User',
-        email: 'admin@glassshop.com',
-        password: hashedAdminPassword,
-        role: 'admin',
-        isVerified: true
-      });
-      console.log('Created Default Admin: admin@glassshop.com / admin123');
+      // 2. Generate and Insert 105+ Products
+      const productsList = generateProducts(categoryMap);
+      await Product.insertMany(productsList);
+      console.log(`Successfully seeded ${productsList.length} products!`);
 
-      // 3. Create Default Products
-      const specsAudio = {
-        'Driver Size': '40mm Dynamic Drivers',
-        'Battery Life': 'Up to 45 hours',
-        'Bluetooth': 'V5.3 (Ultra low latency)',
-        'ANC Depth': '48dB Active Cancellation',
-        'Warranty': '1 Year Domestic Warranty'
-      };
-
-      const specsWatch = {
-        'Display': '1.85-inch AMOLED Ambient Screen',
-        'Water Resistance': 'IP68 Certified Protection',
-        'Sensor Grid': 'Optical HR, SpO2, Sleep Tracker',
-        'Charge Method': 'Magnetic Induction Cradle',
-        'Battery Duration': '7 Days Active Use'
-      };
-
-      const specsCharger = {
-        'Material': 'Frosted Acrylic & Anodized Steel',
-        'USB Ports': '2 x Type-C (Power Delivery 3.0)',
-        'Output capacity': '140W Hyper-charging support',
-        'Indicator': 'Ice-blue LED status light'
-      };
-
-      await Product.create([
-        {
-          name: 'AeroPro Max ANC Headphones',
-          slug: 'aeropro-max-anc-headphones',
-          description: 'Experience pure acoustic brilliance with advanced active noise cancellation, custom audio profiles, and cloud-soft memory cushions for long listening sessions.',
-          price: 12999,
-          compareAtPrice: 19999,
-          images: [
-            'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1484704849700-f032a568e944?auto=format&fit=crop&q=80&w=600'
-          ],
-          category: catAudio._id,
-          inventory: 24,
-          ratings: { average: 4.8, count: 18 },
-          features: ['Hybrid Active Noise Cancellation', 'Ambient transparency feedback', 'Hi-Res Audio Gold certification', 'Voice assistant integrations'],
-          tags: ['audio', 'headphones', 'anc', 'wireless'],
-          specifications: specsAudio
-        },
-        {
-          name: 'Chronos Lux Smart Chronograph',
-          slug: 'chronos-lux-smart-chronograph',
-          description: 'A masterpiece blending luxury styling with cutting-edge vitals monitoring. Features a sleek metallic chassis, customizable dial arrays, and long battery life.',
-          price: 18499,
-          compareAtPrice: 24999,
-          images: [
-            'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1517502884422-41eaaced0168?auto=format&fit=crop&q=80&w=600'
-          ],
-          category: catWatches._id,
-          inventory: 12,
-          ratings: { average: 4.6, count: 9 },
-          features: ['Always-On AMOLED Console', 'Real-time heart rate and oxygenation sensors', 'Custom aluminum structure', 'Waterproof build'],
-          tags: ['watch', 'wearables', 'smart', 'luxury'],
-          specifications: specsWatch
-        },
-        {
-          name: 'HyperDrive 140W Charging Dock',
-          slug: 'hyperdrive-140w-charging-dock',
-          description: 'Power up to four accessories simultaneously using our crystal-cased hyper-charging hub. Delivers smart power allocation and premium heat management.',
-          price: 4999,
-          compareAtPrice: 7999,
-          images: [
-            'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=600',
-            'https://images.unsplash.com/photo-1622445262465-2481c4574875?auto=format&fit=crop&q=80&w=600'
-          ],
-          category: catGear._id,
-          inventory: 2, // Low stock on purpose for testing low-stock alerts
-          ratings: { average: 4.3, count: 5 },
-          features: ['Dual GaN Fast charging circuits', 'Intelligent thermal controls', 'Luminescent status indicator line'],
-          tags: ['charger', 'desk', 'power', 'minimalist'],
-          specifications: specsCharger
-        }
-      ]);
-
-      // 4. Create Coupons
+      // 3. Create Coupons
       await Coupon.create([
         {
           code: 'FIRST10',
@@ -184,7 +126,7 @@ const seedDatabase = async () => {
           isActive: true
         }
       ]);
-      console.log('Sample data seeding complete.');
+      console.log('Sample coupons seeded complete.');
     }
   } catch (error) {
     console.error('Seeding database failed:', error);

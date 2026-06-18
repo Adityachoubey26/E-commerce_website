@@ -21,7 +21,7 @@ export default function LoginPage() {
   // If already logged in, redirect
   React.useEffect(() => {
     if (user) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [user, router]);
 
@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     const res = await login(email, password);
     if (res.success) {
-      router.push('/');
+      router.push('/dashboard');
     } else {
       setErrorMsg(res.message || 'Login failed.');
       setLoading(false);

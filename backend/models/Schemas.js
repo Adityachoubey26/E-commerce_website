@@ -19,7 +19,26 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   verificationToken: { type: String },
   resetToken: { type: String },
-  addresses: [addressSchema]
+  addresses: [addressSchema],
+  walletBalance: { type: Number, default: 5000 },
+  tokensAvailable: { type: Number, default: 100 },
+  tokensLifetime: { type: Number, default: 100 },
+  walletTransactions: [
+    {
+      amount: { type: Number, required: true },
+      type: { type: String, enum: ['credit', 'debit'], required: true },
+      description: { type: String, required: true },
+      timestamp: { type: Date, default: Date.now }
+    }
+  ],
+  tokenTransactions: [
+    {
+      amount: { type: Number, required: true },
+      type: { type: String, enum: ['earn', 'redeem'], required: true },
+      description: { type: String, required: true },
+      timestamp: { type: Date, default: Date.now }
+    }
+  ]
 }, { timestamps: true });
 
 // --- Category Schema ---
@@ -87,6 +106,7 @@ const orderSchema = new mongoose.Schema({
   subtotal: { type: Number, required: true },
   couponApplied: { type: mongoose.Schema.Types.ObjectId, ref: 'Coupon' },
   discountAmount: { type: Number, default: 0 },
+  tokensRedeemed: { type: Number, default: 0 },
   total: { type: Number, required: true },
   invoicePath: { type: String },
   trackingHistory: [trackingStepSchema]

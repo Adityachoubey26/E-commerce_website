@@ -1,4 +1,4 @@
-import { Order, Product, Coupon, Cart } from '../models/Schemas.js';
+import { Order, Product, Coupon, Cart, User } from '../models/Schemas.js';
 import { createRazorpayOrder, verifyPaymentSignature } from '../services/paymentService.js';
 import { generateInvoicePDF } from '../services/invoiceService.js';
 import path from 'path';
@@ -7,7 +7,7 @@ import path from 'path';
 // @route   POST /api/orders
 // @access  Private
 export const createOrder = async (req, res) => {
-  const { items, shippingAddress, paymentMethod, couponCode } = req.body;
+  const { items, shippingAddress, paymentMethod, couponCode, useTokens, tokensRedeemed } = req.body;
   try {
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'No order items' });
@@ -60,9 +60,18 @@ export const createOrder = async (req, res) => {
       }
     }
 
-    const total = Math.max(0, subtotal - discountAmount);
+    let total = Math.max(0, subtotal - discountAmount);
 
-    // 3. Create initial order structure
+    // 3. Process Tokens Discount if checked
+    let redeemed = 0;
+    const userDoc = await User.findById(req.user._id);
+    if (useTokens && tokensRedeemed > 0 && userDoc) {
+      const maxRedeemable = Math.floor(Math.min(userDoc.tokensAvailable, total));
+      redeemed = Math.min(tokensRedeemed, maxRedeemable);
+      total = Math.max(0, total - redeemed);
+    }
+
+    // 4. Create initial order structure
     const order = new Order({
       user: req.user._id,
       items: orderItems,
@@ -73,6 +82,7 @@ export const createOrder = async (req, res) => {
       subtotal,
       couponApplied,
       discountAmount,
+      tokensRedeemed: redeemed,
       total,
       trackingHistory: [{ status: 'pending', notes: 'Order placed, awaiting processing' }]
     });
@@ -89,9 +99,97 @@ export const createOrder = async (req, res) => {
         razorpayOrder,
         orderId: order._id
       });
+    } else if (paymentMethod === 'Wallet') {
+      if (!userDoc || userDoc.walletBalance < total) {
+        return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
+      }
+
+      // Finalize wallet transaction
+      userDoc.walletBalance -= total;
+      userDoc.walletTransactions.push({
+        amount: total,
+        type: 'debit',
+        description: `Purchased order ${order._id}`
+      });
+
+      // Handle token deduction
+      if (redeemed > 0) {
+        userDoc.tokensAvailable -= redeemed;
+        userDoc.tokenTransactions.push({
+          amount: redeemed,
+          type: 'redeem',
+          description: `Redeemed on order ${order._id}`
+        });
+      }
+
+      // Earn new tokens (₹100 = 1 token)
+      const earnedTokens = Math.floor(total / 100);
+      if (earnedTokens > 0) {
+        userDoc.tokensAvailable += earnedTokens;
+        userDoc.tokensLifetime += earnedTokens;
+        userDoc.tokenTransactions.push({
+          amount: earnedTokens,
+          type: 'earn',
+          description: `Earned from purchase ${order._id}`
+        });
+      }
+
+      await userDoc.save();
+
+      order.paymentStatus = 'paid';
+      order.orderStatus = 'processing';
+      order.trackingHistory.push({ status: 'processing', notes: 'Payment debited from Wallet successfully' });
+
+      // Deduct inventory
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { inventory: -item.quantity }
+        });
+      }
+
+      // Generate invoice
+      const invoiceUrl = await generateInvoicePDF(order, order._id.toString());
+      order.invoicePath = invoiceUrl;
+      await order.save();
+
+      // Clear Cart
+      await Cart.findOneAndUpdate({ user: req.user._id }, { items: [] });
+
+      return res.status(201).json({
+        success: true,
+        paymentRequired: false,
+        order
+      });
     } else {
       // COD Order
       order.paymentStatus = 'pending';
+      
+      // Handle token deduction for COD
+      if (redeemed > 0 && userDoc) {
+        userDoc.tokensAvailable -= redeemed;
+        userDoc.tokenTransactions.push({
+          amount: redeemed,
+          type: 'redeem',
+          description: `Redeemed on order ${order._id}`
+        });
+      }
+
+      // Earn new tokens (₹100 = 1 token)
+      const earnedTokens = Math.floor(total / 100);
+      if (earnedTokens > 0 && userDoc) {
+        userDoc.tokensAvailable += earnedTokens;
+        userDoc.tokensLifetime += earnedTokens;
+        userDoc.tokenTransactions.push({
+          amount: earnedTokens,
+          type: 'earn',
+          description: `Earned from COD order ${order._id}`
+        });
+      }
+
+      if (userDoc) {
+        await userDoc.save();
+      }
+
       await order.save();
 
       // Deduct inventory
@@ -140,6 +238,33 @@ export const verifyOrderPayment = async (req, res) => {
     order.paymentId = razorpayPaymentId;
     order.orderStatus = 'processing';
     order.trackingHistory.push({ status: 'processing', notes: 'Payment verified successfully' });
+
+    const userDoc = await User.findById(req.user._id);
+    if (userDoc) {
+      // Handle token deduction
+      if (order.tokensRedeemed > 0) {
+        userDoc.tokensAvailable = Math.max(0, userDoc.tokensAvailable - order.tokensRedeemed);
+        userDoc.tokenTransactions.push({
+          amount: order.tokensRedeemed,
+          type: 'redeem',
+          description: `Redeemed on order ${order._id}`
+        });
+      }
+
+      // Earn new tokens (1 for every ₹100)
+      const earnedTokens = Math.floor(order.total / 100);
+      if (earnedTokens > 0) {
+        userDoc.tokensAvailable += earnedTokens;
+        userDoc.tokensLifetime += earnedTokens;
+        userDoc.tokenTransactions.push({
+          amount: earnedTokens,
+          type: 'earn',
+          description: `Earned from purchase ${order._id}`
+        });
+      }
+
+      await userDoc.save();
+    }
 
     // Deduct stock
     for (const item of order.items) {

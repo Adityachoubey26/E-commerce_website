@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useTheme } from '../context/ThemeContext';
-import { Search, ShoppingCart, Heart, User, LogOut, Sun, Moon, LayoutDashboard, Menu, Bell, Sparkles } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, LogOut, Sun, Moon, LayoutDashboard, Menu, X, Bell, Sparkles } from 'lucide-react';
 import logoImg from '../assets/ShopEra_Logo.png';
 
 export const Navbar: React.FC = () => {
@@ -17,6 +17,7 @@ export const Navbar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [searchVal, setSearchVal] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -33,9 +34,17 @@ export const Navbar: React.FC = () => {
     <header className="sticky top-0 z-50 w-full transition-all duration-300 glassmorphism premium-shadow">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-20 items-center justify-between gap-4">
-          {/* Logo */}
-          <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2">
+          {/* Logo & Burger */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-text-secondary dark:text-slate-300 transition-all cursor-pointer"
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2">
               <Image 
                 src={logoImg} 
                 alt="ShopEra Logo" 
@@ -46,19 +55,19 @@ export const Navbar: React.FC = () => {
 
             {/* Mega Menu Links */}
             <nav className="hidden lg:flex items-center gap-6 text-sm font-semibold text-text-secondary dark:text-slate-300">
-              <Link href="/products" className="hover:text-primary transition-colors">Shop All</Link>
+              <Link href={user ? "/dashboard" : "/login"} className="hover:text-primary transition-colors">Shop All</Link>
               <div className="relative group">
                 <button className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer">
                   Categories
                 </button>
                 <div className="absolute top-full left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 p-2 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <Link href="/products?category=premium-audio" className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Premium Audio</Link>
-                  <Link href="/products?category=smart-watches" className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Smart Watches</Link>
-                  <Link href="/products?category=minimalist-accessories" className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Accessories</Link>
+                  <Link href={user ? "/dashboard" : "/login"} className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Premium Audio</Link>
+                  <Link href={user ? "/dashboard" : "/login"} className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Smart Watches</Link>
+                  <Link href={user ? "/dashboard" : "/login"} className="block px-4 py-2.5 rounded-xl text-xs hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-primary font-bold">Accessories</Link>
                 </div>
               </div>
-              <Link href="/products" className="hover:text-primary transition-colors">New Arrivals</Link>
-              <Link href="/products" className="hover:text-primary transition-colors">Offers</Link>
+              <Link href={user ? "/dashboard" : "/login"} className="hover:text-primary transition-colors">New Arrivals</Link>
+              <Link href={user ? "/dashboard" : "/login"} className="hover:text-primary transition-colors">Offers</Link>
             </nav>
           </div>
 
@@ -180,6 +189,48 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Panel */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-t border-slate-200/50 dark:border-white/5 bg-white/95 dark:bg-slate-950/95 backdrop-blur-lg px-4 py-4 space-y-4 shadow-xl">
+          {/* Mobile Search Bar */}
+          <form onSubmit={(e) => { handleSearchSubmit(e); setMobileMenuOpen(false); }} className="relative w-full">
+            <input
+              type="text"
+              placeholder="Ask Gemini AI search..."
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary border border-transparent dark:border-white/5 transition-all text-text-primary dark:text-white placeholder-text-secondary"
+            />
+            <Search className="absolute left-3.5 top-2.5 w-4 h-4 text-text-secondary dark:text-slate-400" />
+            <div className="absolute right-3.5 top-2 flex items-center gap-1 pointer-events-none">
+              <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
+              <span className="text-[9px] font-black uppercase text-secondary">AI</span>
+            </div>
+          </form>
+
+          {/* Navigation Links */}
+          <nav className="flex flex-col gap-3.5 text-sm font-semibold text-text-secondary dark:text-slate-300">
+            <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-1.5 border-b border-slate-100 dark:border-slate-800">
+              Shop All
+            </Link>
+            <div className="flex flex-col gap-2 py-1.5 border-b border-slate-100 dark:border-slate-800">
+              <span className="text-text-primary dark:text-white text-xs font-black uppercase tracking-wider">Categories</span>
+              <div className="pl-3 flex flex-col gap-2.5 mt-1">
+                <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary text-xs">Premium Audio</Link>
+                <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary text-xs">Smart Watches</Link>
+                <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary text-xs">Accessories</Link>
+              </div>
+            </div>
+            <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-1.5 border-b border-slate-100 dark:border-slate-800">
+              New Arrivals
+            </Link>
+            <Link href={user ? "/dashboard" : "/login"} onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-1.5">
+              Offers
+            </Link>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };

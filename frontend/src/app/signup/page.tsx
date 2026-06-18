@@ -22,7 +22,7 @@ export default function SignupPage() {
   // If already logged in, redirect
   React.useEffect(() => {
     if (user) {
-      router.push('/');
+      router.push('/dashboard');
     }
   }, [user, router]);
 
@@ -40,7 +40,7 @@ export default function SignupPage() {
 
     const res = await signup(name, email, password);
     if (res.success) {
-      router.push('/');
+      router.push('/dashboard');
     } else {
       setErrorMsg(res.message || 'Signup failed.');
       setLoading(false);

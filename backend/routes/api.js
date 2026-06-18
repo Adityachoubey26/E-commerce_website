@@ -5,6 +5,7 @@ import { getCart, updateCart, getWishlist, toggleWishlist } from '../controllers
 import { createOrder, verifyOrderPayment, getMyOrders, getOrderById, validateCoupon } from '../controllers/orderController.js';
 import { handleAIChat, handleAICompare, handleAISummarizeReviews, handleAIFAQ } from '../controllers/aiController.js';
 import { getAdminStats, createProduct, updateProduct, deleteProduct, createCategory, updateOrderStatus, getAllOrdersAdmin, getAllUsersAdmin, getAdminAIInsights } from '../controllers/adminController.js';
+import { getWalletDetails, addWalletFunds, getTokenDetails, adjustWalletTokensAdmin } from '../controllers/walletTokenController.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -52,5 +53,11 @@ router.post('/admin/categories', protect, adminOnly, createCategory);
 router.put('/admin/orders/:id/status', protect, adminOnly, updateOrderStatus);
 router.get('/admin/orders', protect, adminOnly, getAllOrdersAdmin);
 router.get('/admin/users', protect, adminOnly, getAllUsersAdmin);
+
+// --- Wallet & Token Routes ---
+router.get('/wallet/details', protect, getWalletDetails);
+router.post('/wallet/add-funds', protect, addWalletFunds);
+router.get('/tokens/details', protect, getTokenDetails);
+router.post('/admin/wallet-tokens', protect, adminOnly, adjustWalletTokensAdmin);
 
 export default router;

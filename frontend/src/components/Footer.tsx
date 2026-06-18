@@ -137,19 +137,19 @@ export const Footer: React.FC = () => {
 
         {/* Contact info */}
         <motion.div variants={itemVariants} className="space-y-4">
-          <h4 className="text-sm font-bold text-white mb-4">Contact Us</h4>
+          <h4 className="text-sm font-bold text-white mb-4">Contact Founder</h4>
           <ul className="space-y-3.5 text-xs">
             <li className="flex items-start gap-2">
               <MapPin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-              <span className="text-slate-300">123 Tech Boulevard, Suite 300, Bangalore, India</span>
+              <span className="text-slate-300">Founder: Aditya Choubey</span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-slate-300">support@shoperapro.com</span>
+              <span className="text-slate-300">adityachoubey26@gmail.com</span>
             </li>
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-slate-300">+1 800-SHOPERA-PRO</span>
+              <span className="text-slate-300">+91 9310526618</span>
             </li>
           </ul>
         </motion.div>

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import API from '../../utils/api';
-import { ShieldCheck, MapPin, CreditCard, Tag, Plus, Check, Loader2, Sparkles, X, ChevronRight, Lock } from 'lucide-react';
+import { ShieldCheck, MapPin, CreditCard, Tag, Plus, Check, Loader2, Sparkles, X, ChevronRight, Lock, Coins, Wallet } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -28,22 +28,66 @@ export default function CheckoutPage() {
   const [country, setCountry] = useState('India');
 
   // Checkout flow states
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'Razorpay'>('COD');
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'Razorpay' | 'Wallet'>('COD');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  // Wallet & Tokens Balance States
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [tokensAvailable, setTokensAvailable] = useState(0);
+  const [useTokens, setUseTokens] = useState(false);
+  const [tokensToRedeem, setTokensToRedeem] = useState(0);
 
   // Simulated Razorpay Modal states
   const [showRazorpayModal, setShowRazorpayModal] = useState(false);
   const [razorpayOrderId, setRazorpayOrderId] = useState('');
   const [pendingOrderId, setPendingOrderId] = useState('');
 
+  // Fetch balances
+  useEffect(() => {
+    const fetchBalances = async () => {
+      try {
+        const wRes = await API.get('/wallet/details');
+        if (wRes.data.success) setWalletBalance(wRes.data.balance);
+        const tRes = await API.get('/tokens/details');
+        if (tRes.data.success) {
+          setTokensAvailable(tRes.data.tokensAvailable);
+        }
+      } catch (err) {
+        console.error('Failed to load wallet/token balances for checkout:', err);
+      }
+    };
+    if (user) {
+      fetchBalances();
+    }
+  }, [user]);
+
   if (cartItems.length === 0) {
     return (
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center text-text-secondary dark:text-slate-400 font-bold">
         <p className="text-sm">Your cart is currently empty. Add items to checkout.</p>
-        <Link href="/products" className="text-xs text-primary hover:underline mt-2 inline-block font-black">Go to Catalog</Link>
+        <Link href="/dashboard" className="text-xs text-primary hover:underline mt-2 inline-block font-black">Go to Catalog</Link>
       </div>
     );
   }
+
+  // Calculate total before tokens redemption
+  const getSubtotalWithCoupon = () => {
+    return Math.max(0, getCartTotal());
+  };
+
+  // Get final total after tokens are applied
+  const getFinalOrderTotal = () => {
+    const subTotal = getSubtotalWithCoupon();
+    if (!useTokens) return subTotal;
+    const maxRedeemable = Math.floor(Math.min(tokensAvailable, subTotal));
+    return Math.max(0, subTotal - maxRedeemable);
+  };
+
+  const getRedeemedTokensCount = () => {
+    if (!useTokens) return 0;
+    const subTotal = getSubtotalWithCoupon();
+    return Math.floor(Math.min(tokensAvailable, subTotal));
+  };
 
   const handleAddAddressSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,6 +120,12 @@ export default function CheckoutPage() {
       return;
     }
 
+    const finalTotal = getFinalOrderTotal();
+    if (paymentMethod === 'Wallet' && walletBalance < finalTotal) {
+      alert('Insufficient wallet balance to pay for this order. Please add funds first.');
+      return;
+    }
+
     setCheckoutLoading(true);
 
     try {
@@ -83,7 +133,9 @@ export default function CheckoutPage() {
         items: cartItems.map(item => ({ product: item.product._id, quantity: item.quantity })),
         shippingAddress: addr,
         paymentMethod,
-        couponCode: coupon ? coupon.code : undefined
+        couponCode: coupon ? coupon.code : undefined,
+        useTokens: useTokens,
+        tokensRedeemed: getRedeemedTokensCount()
       };
 
       const { data } = await API.post('/orders', orderPayload);
@@ -95,7 +147,7 @@ export default function CheckoutPage() {
           setShowRazorpayModal(true);
         } else {
           clearCart();
-          router.push(`/orders`);
+          router.push(`/dashboard`);
         }
       }
     } catch (error: any) {
@@ -117,7 +169,7 @@ export default function CheckoutPage() {
       if (data.success) {
         setShowRazorpayModal(false);
         clearCart();
-        router.push(`/orders`);
+        router.push(`/dashboard`);
       }
     } catch (error) {
       console.error(error);
@@ -137,7 +189,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Steps indicator */}
-      <div className="flex items-center justify-center max-w-xl mx-auto gap-4 py-4">
+      <div className="flex flex-wrap items-center justify-center max-w-xl mx-auto gap-2 sm:gap-4 py-4">
         {[
           { num: 1, label: 'Shipping' },
           { num: 2, label: 'Payment' },
@@ -213,8 +265,8 @@ export default function CheckoutPage() {
                   )}
                 </div>
               ) : (
-                <form onSubmit={handleAddAddressSubmit} className="border-t border-slate-200/50 dark:border-white/5 pt-6 grid grid-cols-2 gap-4 text-xs font-semibold">
-                  <div className="col-span-2 space-y-1">
+                <form onSubmit={handleAddAddressSubmit} className="border-t border-slate-200/50 dark:border-white/5 pt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-semibold">
+                  <div className="col-span-1 sm:col-span-2 space-y-1">
                     <label className="text-[10px] font-black text-text-secondary dark:text-slate-400 uppercase tracking-widest block">Street Address</label>
                     <input
                       type="text"
@@ -268,7 +320,7 @@ export default function CheckoutPage() {
                       className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-white/10 rounded-xl px-4 py-2.5 text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
-                  <div className="col-span-2 flex justify-end gap-3 pt-3 border-t border-slate-200/60 dark:border-white/5">
+                  <div className="col-span-1 sm:col-span-2 flex justify-end gap-3 pt-3 border-t border-slate-200/60 dark:border-white/5">
                     <button
                       type="button"
                       onClick={() => setShowAddressForm(false)}
@@ -295,14 +347,15 @@ export default function CheckoutPage() {
                 2. Select Payment Method
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {[
+                  { type: 'Wallet', label: 'ShopEra Wallet', desc: `Pay instantly using wallet. Balance: ₹${walletBalance}` },
                   { type: 'COD', label: 'Cash on Delivery (COD)', desc: 'Pay with cash upon package receipt.' },
-                  { type: 'Razorpay', label: 'Online Payment (Razorpay)', desc: 'Pay instantly via UPI, Cards, Netbanking.' }
+                  { type: 'Razorpay', label: 'Online Gateway', desc: 'Pay instantly via UPI, Cards, Netbanking.' }
                 ].map((pm) => (
                   <button
                     key={pm.type}
-                    onClick={() => setPaymentMethod(pm.type as 'COD' | 'Razorpay')}
+                    onClick={() => setPaymentMethod(pm.type as 'COD' | 'Razorpay' | 'Wallet')}
                     className={`text-left p-5 rounded-2xl border text-xs relative cursor-pointer transition-all ${
                       paymentMethod === pm.type
                         ? 'border-primary bg-primary/5 text-text-primary dark:text-white font-bold'
@@ -319,6 +372,33 @@ export default function CheckoutPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Loyalty Tokens Redemption Section */}
+              {tokensAvailable > 0 && (
+                <div className="p-5 rounded-2xl bg-purple-500/10 border border-purple-500/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-purple-700 dark:text-purple-400 flex items-center gap-1.5">
+                      <Coins className="w-4 h-4 text-purple-600 animate-bounce" /> Apply ShopEra Loyalty Tokens
+                    </span>
+                    <span className="text-[10px] font-bold text-purple-600 bg-purple-100 dark:bg-purple-900/50 px-3 py-1 rounded-full">
+                      {tokensAvailable} SET Available (₹{tokensAvailable})
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      id="applyTokens"
+                      checked={useTokens}
+                      onChange={(e) => setUseTokens(e.target.checked)}
+                      className="w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 dark:border-white/10 cursor-pointer"
+                    />
+                    <label htmlFor="applyTokens" className="text-xs font-bold text-text-primary dark:text-white cursor-pointer select-none">
+                      Redeem tokens for discount on this order (1 Token = ₹1)
+                    </label>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-between items-center pt-4 border-t border-slate-200/50 dark:border-white/5">
                 <button
@@ -352,7 +432,13 @@ export default function CheckoutPage() {
                 </div>
                 <div className="p-5 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/60 dark:border-white/5">
                   <h4 className="font-bold text-text-primary dark:text-white mb-2">Payment Method</h4>
-                  <p className="font-bold text-primary">{paymentMethod === 'COD' ? 'Cash on Delivery (COD)' : 'Razorpay Online Gateway'}</p>
+                  <p className="font-bold text-primary">
+                    {paymentMethod === 'Wallet' 
+                      ? 'ShopEra Digital Wallet Balance' 
+                      : paymentMethod === 'COD' 
+                      ? 'Cash on Delivery (COD)' 
+                      : 'Razorpay Online Gateway'}
+                  </p>
                 </div>
               </div>
 
@@ -422,13 +508,19 @@ export default function CheckoutPage() {
                   <span>- ₹{discount.toLocaleString()}</span>
                 </div>
               )}
+              {useTokens && tokensAvailable > 0 && (
+                <div className="flex justify-between text-purple-600 font-bold">
+                  <span>Loyalty Discount</span>
+                  <span>- ₹{getRedeemedTokensCount().toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between text-text-secondary dark:text-slate-400">
                 <span>Shipping Fees</span>
                 <span className="text-emerald-600 font-bold">FREE</span>
               </div>
               <div className="flex justify-between text-sm font-black text-text-primary dark:text-white pt-2.5 border-t border-slate-200/50 dark:border-white/5">
                 <span>Total Amount</span>
-                <span>₹{getCartTotal().toLocaleString()}</span>
+                <span>₹{getFinalOrderTotal().toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -468,7 +560,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between font-black border-t border-white/5 pt-2 text-white">
                   <span>Payable Total:</span>
-                  <span>₹{getCartTotal().toLocaleString()}</span>
+                  <span>₹{getFinalOrderTotal().toLocaleString()}</span>
                 </div>
               </div>
 
@@ -486,4 +578,3 @@ export default function CheckoutPage() {
     </div>
   );
 }
-

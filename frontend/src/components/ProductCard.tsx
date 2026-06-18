@@ -111,7 +111,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 <Star className="w-3.5 h-3.5 fill-current" />
               </div>
               <span className="text-xs text-text-secondary dark:text-slate-300 font-bold">
-                {product.ratings?.average || 0}
+                {product.ratings?.average ? Number(product.ratings.average).toFixed(1) : 0}
               </span>
               <span className="text-[10px] text-text-secondary dark:text-slate-400">
                 ({product.ratings?.count || 0} reviews)
