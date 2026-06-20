@@ -8,6 +8,7 @@ import { useCart } from '../../context/CartContext';
 import API from '../../utils/api';
 import { Product, Category, Order, WalletTransaction, TokenTransaction } from '../../../../shared/types';
 import { ProductCard } from '../../components/ProductCard';
+import { ProductImage } from '../../components/ProductImage';
 import { 
   Sparkles, SlidersHorizontal, Grid, List, RefreshCw, Wallet, 
   Coins, ShoppingBag, Heart, User, Settings, ArrowRight, Star, Plus,
@@ -760,7 +761,7 @@ export default function DashboardPage() {
                                     <div className="flex items-center gap-3 min-w-0">
                                       <div className="w-12 h-12 bg-slate-100 dark:bg-slate-800 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center border border-slate-200/50 dark:border-white/5">
                                         {prod && typeof prod === 'object' && prod.images?.[0] ? (
-                                          <img src={prod.images[0]} alt={prod.name} className="w-full h-full object-cover" />
+                                          <ProductImage src={prod.images[0]} alt={prod.name} />
                                         ) : (
                                           <ShoppingBag className="w-6 h-6 text-slate-400" />
                                         )}

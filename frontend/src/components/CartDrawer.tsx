@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 import { useRouter } from 'next/navigation';
 import { X, ShoppingBag, Plus, Minus, Trash, Tag, Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
+import { ProductImage } from './ProductImage';
 
 export const CartDrawer: React.FC = () => {
   const router = useRouter();
@@ -100,11 +101,12 @@ export const CartDrawer: React.FC = () => {
                     key={item.product._id}
                     className="flex gap-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200/60 dark:border-white/5 relative overflow-hidden"
                   >
-                    <img
-                      src={item.product.images[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=120'}
-                      alt={item.product.name}
-                      className="w-16 h-16 object-cover rounded-xl bg-slate-100 dark:bg-slate-950 flex-shrink-0"
-                    />
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950 flex-shrink-0">
+                      <ProductImage
+                        src={item.product.images[0] || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=120'}
+                        alt={item.product.name}
+                      />
+                    </div>
 
                     <div className="flex-1 flex flex-col justify-between min-w-0">
                       <div>

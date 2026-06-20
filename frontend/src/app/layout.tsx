@@ -9,6 +9,7 @@ import { Footer } from '../components/Footer';
 import { FloatingParticles } from '../components/FloatingParticles';
 import { AIChatBot } from '../components/AIChatBot';
 import { CartDrawer } from '../components/CartDrawer';
+import { IntroWrapper } from '../components/IntroWrapper';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -40,25 +41,27 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               
-              {/* Particle background */}
-              <FloatingParticles />
+              <IntroWrapper>
+                {/* Particle background */}
+                <FloatingParticles />
 
-              {/* Header */}
-              <Navbar />
+                {/* Header */}
+                <Navbar />
 
-              {/* Main Content */}
-              <main className="flex-1 relative z-10 w-full">
-                {children}
-              </main>
+                {/* Main Content */}
+                <main className="flex-1 relative z-10 w-full">
+                  {children}
+                </main>
 
-              {/* Global AI Floating Assistant */}
-              <AIChatBot />
+                {/* Global AI Floating Assistant */}
+                <AIChatBot />
 
-              {/* Global Cart Slide-out Drawer */}
-              <CartDrawer />
+                {/* Global Cart Slide-out Drawer */}
+                <CartDrawer />
 
-              {/* Footer */}
-              <Footer />
+                {/* Footer */}
+                <Footer />
+              </IntroWrapper>
 
             </CartProvider>
           </AuthProvider>

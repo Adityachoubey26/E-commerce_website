@@ -7,6 +7,7 @@ import { useCart } from '../../../context/CartContext';
 import API from '../../../utils/api';
 import { Star, ShoppingCart, Heart, Sparkles, Check, ChevronRight, MessageSquare, ShieldCheck, RefreshCw, Layers, Plus } from 'lucide-react';
 import { Product, Review } from '../../../../../shared/types';
+import { ProductImage } from '../../../components/ProductImage';
 
 interface ProductDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -208,7 +209,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
           >
-            <img src={selectedImg || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600'} alt={product.name} className="w-full h-full object-cover" />
+            <ProductImage src={selectedImg || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600'} alt={product.name} />
             
             {/* Magnifier glass overlay */}
             <div
@@ -241,7 +242,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     selectedImg === img ? 'border-primary shadow-md scale-95' : 'border-slate-200 dark:border-white/5 hover:border-slate-350 dark:hover:border-white/20'
                   }`}
                 >
-                  <img src={img} className="w-full h-full object-cover" />
+                  <div className="w-full h-full">
+                    <ProductImage src={img} alt={`${product.name} thumbnail ${idx}`} />
+                  </div>
                 </button>
               ))}
             </div>
@@ -349,7 +352,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
           <div className="flex flex-wrap items-center gap-4 justify-center">
             {/* Current Item */}
             <div className="flex flex-col items-center p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-white/5 w-44 text-center">
-              <img src={product.images[0]} className="w-16 h-16 object-cover rounded-xl" />
+              <div className="w-16 h-16 overflow-hidden rounded-xl">
+                <ProductImage src={product.images[0]} alt={product.name} />
+              </div>
               <span className="text-[10px] font-bold text-text-primary dark:text-white line-clamp-1 mt-2">{product.name}</span>
               <span className="text-xs font-bold text-text-secondary dark:text-slate-400 mt-1">₹{product.price.toLocaleString()}</span>
             </div>
@@ -358,7 +363,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
             {/* Accessory Item 1 */}
             <div className="flex flex-col items-center p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-white/5 w-44 text-center">
-              <img src="https://images.unsplash.com/photo-1527814050087-379526332c8e?auto=format&fit=crop&q=80&w=200" className="w-16 h-16 object-cover rounded-xl" />
+              <div className="w-16 h-16 overflow-hidden rounded-xl">
+                <ProductImage src="https://images.unsplash.com/photo-1527814050087-379526332c8e?auto=format&fit=crop&q=80&w=200" alt="Leather Carry Pouch" />
+              </div>
               <span className="text-[10px] font-bold text-text-primary dark:text-white line-clamp-1 mt-2">Leather Carry Pouch</span>
               <span className="text-xs font-bold text-text-secondary dark:text-slate-400 mt-1">₹1,499</span>
             </div>
@@ -367,7 +374,9 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
             {/* Accessory Item 2 */}
             <div className="flex flex-col items-center p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-white/5 w-44 text-center">
-              <img src="https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=200" className="w-16 h-16 object-cover rounded-xl" />
+              <div className="w-16 h-16 overflow-hidden rounded-xl">
+                <ProductImage src="https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&q=80&w=200" alt="Extended Warranty" />
+              </div>
               <span className="text-[10px] font-bold text-text-primary dark:text-white line-clamp-1 mt-2">Extended Warranty</span>
               <span className="text-xs font-bold text-text-secondary dark:text-slate-400 mt-1">₹999</span>
             </div>

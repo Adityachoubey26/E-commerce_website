@@ -15,6 +15,7 @@ import {
 import API from '../utils/api';
 import { Product } from '../../../shared/types';
 import { ProductCard } from '../components/ProductCard';
+import { ScrollReveal } from '../components/ScrollReveal';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -225,165 +226,175 @@ export default function LandingPage() {
       </AuroraBackground>
 
       {/* 2. BRANDS SCROLL */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Available Products From Top Brands</h2>
-          <p className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 font-medium">
-            Discover premium products from Apple, Samsung, Sony, Dell, HP, Lenovo, Asus, JBL and other leading technology brands.
-          </p>
-        </div>
-        <div className="bg-slate-50 dark:bg-slate-900/30 py-8 border-y border-slate-200/50 dark:border-white/5 rounded-3xl overflow-hidden">
-          <InfiniteMarquee items={brands} speed={30} />
-        </div>
-      </section>
+      <ScrollReveal>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Available Products From Top Brands</h2>
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 font-medium">
+              Discover premium products from Apple, Samsung, Sony, Dell, HP, Lenovo, Asus, JBL and other leading technology brands.
+            </p>
+          </div>
+          <div className="bg-slate-50 dark:bg-slate-900/30 py-8 border-y border-slate-200/50 dark:border-white/5 rounded-3xl overflow-hidden">
+            <InfiniteMarquee items={brands} speed={30} />
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* 3. ABOUT SHOPERA SECTION */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Who We Are</span>
-            <h2 className="text-3xl sm:text-4xl font-black text-text-primary dark:text-white leading-tight">
-              A Unified Ecosystem Built for Modern Commerce.
-            </h2>
-            <p className="text-sm text-text-secondary dark:text-slate-300 leading-relaxed font-medium">
-              ShopEra was founded to bridge the gap between AI recommendations, convenient loyalty rewards, and high-performance electronic hardware. We build gadgets that empower productivity, combined with an application designed to delight at every click.
-            </p>
-            <div className="flex flex-col gap-3.5">
-              <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>Zero-friction payments using integrated digital wallets</span>
-              </div>
-              <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>Loyalty system offering up to 10% direct savings on orders</span>
-              </div>
-              <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
-                <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                <span>24/7 Gemini-driven 3D Conversational Assistant</span>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Who We Are</span>
+              <h2 className="text-3xl sm:text-4xl font-black text-text-primary dark:text-white leading-tight">
+                A Unified Ecosystem Built for Modern Commerce.
+              </h2>
+              <p className="text-sm text-text-secondary dark:text-slate-300 leading-relaxed font-medium">
+                ShopEra was founded to bridge the gap between AI recommendations, convenient loyalty rewards, and high-performance electronic hardware. We build gadgets that empower productivity, combined with an application designed to delight at every click.
+              </p>
+              <div className="flex flex-col gap-3.5">
+                <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <span>Zero-friction payments using integrated digital wallets</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <span>Loyalty system offering up to 10% direct savings on orders</span>
+                </div>
+                <div className="flex items-center gap-3 text-xs font-bold text-text-primary dark:text-slate-200">
+                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                  <span>24/7 Gemini-driven 3D Conversational Assistant</span>
+                </div>
               </div>
             </div>
+            
+            <div className="rounded-3xl overflow-hidden h-[400px] border border-slate-200/50 dark:border-white/5 shadow-lg relative">
+              <img
+                src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=800"
+                className="w-full h-full object-cover"
+                alt="About ShopEra mockup"
+              />
+            </div>
           </div>
-          
-          <div className="rounded-3xl overflow-hidden h-[400px] border border-slate-200/50 dark:border-white/5 shadow-lg relative">
-            <img
-              src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=800"
-              className="w-full h-full object-cover"
-              alt="About ShopEra mockup"
-            />
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* 4. STATISTICS COUNTER */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-900 text-white p-8 md:p-12 rounded-3xl border border-white/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(139,92,246,0.15),transparent_50%)]" />
-          <div className="text-center space-y-1 relative z-10">
-            <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">105+</h3>
-            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Premium Products</p>
+      <ScrollReveal delay={0.15}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-slate-900 text-white p-8 md:p-12 rounded-3xl border border-white/5 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(139,92,246,0.15),transparent_50%)]" />
+            <div className="text-center space-y-1 relative z-10">
+              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">105+</h3>
+              <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Premium Products</p>
+            </div>
+            <div className="text-center space-y-1 relative z-10">
+              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">99.9%</h3>
+              <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Checkout Success</p>
+            </div>
+            <div className="text-center space-y-1 relative z-10">
+              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">5M+</h3>
+              <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Happy Shipments</p>
+            </div>
+            <div className="text-center space-y-1 relative z-10">
+              <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">24/7</h3>
+              <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gemini AI Active</p>
+            </div>
           </div>
-          <div className="text-center space-y-1 relative z-10">
-            <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">99.9%</h3>
-            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Checkout Success</p>
-          </div>
-          <div className="text-center space-y-1 relative z-10">
-            <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">5M+</h3>
-            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Happy Shipments</p>
-          </div>
-          <div className="text-center space-y-1 relative z-10">
-            <h3 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">24/7</h3>
-            <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gemini AI Active</p>
-          </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* 5. APP FEATURES GRID */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-primary">Key Pillars</span>
-          <h2 className="text-3xl sm:text-4xl font-black text-text-primary dark:text-white">Built for the Digital Creator</h2>
-          <p className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 font-medium">
-            Explore advanced components designed to simplify, reward, and protect your digital shopping journey.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 shadow-sm space-y-4 hover:border-primary/45 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-              <Truck className="w-6 h-6" />
-            </div>
-            <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Free Express Shipping</h3>
-            <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
-              We coordinate next-day shipping in all major metros across India for orders above ₹4,000. Real-time updates pushed directly to your timeline.
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-primary">Key Pillars</span>
+            <h2 className="text-3xl sm:text-4xl font-black text-text-primary dark:text-white">Built for the Digital Creator</h2>
+            <p className="text-xs sm:text-sm text-text-secondary dark:text-slate-400 font-medium">
+              Explore advanced components designed to simplify, reward, and protect your digital shopping journey.
             </p>
           </div>
 
-          <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 shadow-sm space-y-4 hover:border-primary/45 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-8 rounded-3xl bg-white dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-white/10 shadow-sm space-y-4 hover:border-primary/45 transition-colors group">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Truck className="w-6 h-6" />
+              </div>
+              <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Free Express Shipping</h3>
+              <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
+                We coordinate next-day shipping in all major metros across India for orders above ₹4,000. Real-time updates pushed directly to your timeline.
+              </p>
             </div>
-            <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Secure Encrypted Gateways</h3>
-            <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
-              Razorpay, UPI, cards, and our native digital wallet are protected with full SSL handshake verification and end-to-end security layers.
-            </p>
-          </div>
 
-          <div className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 shadow-sm space-y-4 hover:border-primary/45 transition-colors">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
-              <RefreshCw className="w-6 h-6" />
+            <div className="p-8 rounded-3xl bg-white dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-white/10 shadow-sm space-y-4 hover:border-primary/45 transition-colors group">
+              <div className="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Secure Encrypted Gateways</h3>
+              <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
+                Razorpay, UPI, cards, and our native digital wallet are protected with full SSL handshake verification and end-to-end security layers.
+              </p>
             </div>
-            <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Hassle-free 30d Returns</h3>
-            <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
-              Not completely satisfied? Process a full returns return window directly from your order tracking timeline. Returns credited instantly.
-            </p>
+
+            <div className="p-8 rounded-3xl bg-white dark:bg-slate-900/40 backdrop-blur-md border border-slate-200/50 dark:border-white/10 shadow-sm space-y-4 hover:border-primary/45 transition-colors group">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <RefreshCw className="w-6 h-6" />
+              </div>
+              <h3 className="font-extrabold text-lg text-text-primary dark:text-white">Hassle-free 30d Returns</h3>
+              <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
+                Not completely satisfied? Process a full returns return window directly from your order tracking timeline. Returns credited instantly.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* 6. AI SHOPPING SYSTEM */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-gradient-to-tr from-slate-950 to-slate-900 text-white p-8 md:p-16 rounded-3xl border border-white/5 relative overflow-hidden">
-          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[90px] pointer-events-none" />
-          
-          <div className="space-y-6 relative z-10">
-            <span className="inline-flex items-center gap-1 bg-white/10 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full">
-              <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
-              Powered by Gemini
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black leading-tight">
-              An AI Companion That Understands Hardware
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-              No more browsing countless reviews. Our floating AI assistant reviews specifications, analyzes customer ratings, answers technical FAQs, and compares distinct items instantly inside your interface.
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <h4 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Voice Commands</h4>
-                <p className="text-[10px] text-slate-400">Speak naturally to request smart comparison cards.</p>
-              </div>
-              <div className="space-y-1">
-                <h4 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Smart Compare</h4>
-                <p className="text-[10px] text-slate-400">Select any two products for structured specification specs.</p>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center bg-gradient-to-tr from-slate-950 to-slate-900 text-white p-8 md:p-16 rounded-3xl border border-white/5 relative overflow-hidden">
+            <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-secondary/20 rounded-full blur-[90px] pointer-events-none" />
+            
+            <div className="space-y-6 relative z-10">
+              <span className="inline-flex items-center gap-1 bg-white/10 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full">
+                <Sparkles className="w-3.5 h-3.5 text-secondary animate-pulse" />
+                Powered by Gemini
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-black leading-tight">
+                An AI Companion That Understands Hardware
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                No more browsing countless reviews. Our floating AI assistant reviews specifications, analyzes customer ratings, answers technical FAQs, and compares distinct items instantly inside your interface.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <h4 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Voice Commands</h4>
+                  <p className="text-[10px] text-slate-400">Speak naturally to request smart comparison cards.</p>
+                </div>
+                <div className="space-y-1">
+                  <h4 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Smart Compare</h4>
+                  <p className="text-[10px] text-slate-400">Select any two products for structured specification specs.</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-4 relative z-10 backdrop-blur-md">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center font-bold text-xs">AI</div>
-              <div>
-                <p className="font-bold text-xs">ShopEra Bot</p>
-                <p className="text-[8px] text-slate-400">Active recommendations</p>
+            <div className="bg-white/5 border border-white/10 p-6 rounded-2xl space-y-4 relative z-10 backdrop-blur-md">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center font-bold text-xs">AI</div>
+                <div>
+                  <p className="font-bold text-xs">ShopEra Bot</p>
+                  <p className="text-[8px] text-slate-400">Active recommendations</p>
+                </div>
               </div>
+              <div className="p-3 bg-white/5 rounded-xl text-[10px] leading-relaxed text-slate-200">
+                &ldquo;I compared the **AeroPro ANC** and the **Chronos active watch**. The AeroPro delivers hi-res audio and premium 45dB cancellation, whereas the watch tracks 120+ fitness profiles. Let me know if you would like me to add both to your shopping list!&rdquo;
+              </div>
+              <div className="h-2 w-2/3 bg-white/10 rounded-full" />
+              <div className="h-2 w-1/2 bg-white/10 rounded-full" />
             </div>
-            <div className="p-3 bg-white/5 rounded-xl text-[10px] leading-relaxed text-slate-200">
-              &ldquo;I compared the **AeroPro ANC** and the **Chronos active watch**. The AeroPro delivers hi-res audio and premium 45dB cancellation, whereas the watch tracks 120+ fitness profiles. Let me know if you would like me to add both to your shopping list!&rdquo;
-            </div>
-            <div className="h-2 w-2/3 bg-white/10 rounded-full" />
-            <div className="h-2 w-1/2 bg-white/10 rounded-full" />
           </div>
-        </div>
-      </section>
+        </section>
+      </ScrollReveal>
 
       {/* 7. WALLET & TOKENS EXPLANATION */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -437,131 +448,139 @@ export default function LandingPage() {
       </section>
 
       {/* 8. CATEGORIES SHOWCASE */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-primary">Discover More</span>
-          <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Shop by Category</h2>
-        </div>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-primary">Discover More</span>
+            <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Shop by Category</h2>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[
-            { name: 'Premium Audio', slug: 'headphones', img: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&q=80&w=500', count: '15+ Items' },
-            { name: 'Smart Watches', slug: 'smart-watches', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500', count: '15+ Items' },
-            { name: 'Minimalist Accessories', slug: 'accessories', img: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=500', count: '15+ Items' }
-          ].map((cat, idx) => (
-            <Link
-              key={idx}
-              href="/login"
-              className="relative group rounded-3xl overflow-hidden h-72 border border-slate-200/50 dark:border-white/5 shadow-md flex flex-col justify-end p-6 cursor-pointer"
-            >
-              <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition-colors z-10" />
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="relative z-20 space-y-1">
-                <span className="text-[10px] text-white/80 font-bold tracking-widest uppercase">{cat.count}</span>
-                <h3 className="text-xl font-extrabold text-white">{cat.name}</h3>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { name: 'Premium Audio', slug: 'headphones', img: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&q=80&w=500', count: '15+ Items' },
+              { name: 'Smart Watches', slug: 'smart-watches', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500', count: '15+ Items' },
+              { name: 'Minimalist Accessories', slug: 'accessories', img: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&q=80&w=500', count: '15+ Items' }
+            ].map((cat, idx) => (
+              <Link
+                key={idx}
+                href="/login"
+                className="relative group rounded-3xl overflow-hidden h-72 border border-slate-200/50 dark:border-white/5 shadow-md flex flex-col justify-end p-6 cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/40 transition-colors z-10" />
+                <img
+                  src={cat.img}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="relative z-20 space-y-1">
+                  <span className="text-[10px] text-white/80 font-bold tracking-widest uppercase">{cat.count}</span>
+                  <h3 className="text-xl font-extrabold text-white">{cat.name}</h3>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* 9. TRENDING PREVIEW */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="flex justify-between items-end">
-          <div className="space-y-2">
-            <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Our Top Picks</span>
-            <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Trending Hardware</h2>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="flex justify-between items-end">
+            <div className="space-y-2">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Our Top Picks</span>
+              <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">Trending Hardware</h2>
+            </div>
+            <Link href="/login" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
+              <span>View All</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
-          <Link href="/login" className="text-sm font-bold text-primary hover:underline flex items-center gap-1">
-            <span>View All</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {loading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-96 rounded-3xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
-            ))
-          ) : (
-            trending.map(prod => (
-              <div key={prod._id} className="relative">
-                <ProductCard product={prod} />
-                <div className="absolute inset-0 bg-slate-950/5 rounded-3xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity backdrop-blur-xs">
-                  <Link href="/login" className="px-6 py-3 bg-primary text-white rounded-full font-bold text-xs shadow-md">Login to view details</Link>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {loading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-96 rounded-3xl bg-slate-200 dark:bg-slate-800 animate-pulse" />
+              ))
+            ) : (
+              trending.map(prod => (
+                <div key={prod._id} className="relative">
+                  <ProductCard product={prod} />
+                  <div className="absolute inset-0 bg-slate-950/5 rounded-3xl flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity backdrop-blur-xs">
+                    <Link href="/login" className="px-6 py-3 bg-primary text-white rounded-full font-bold text-xs shadow-md">Login to view details</Link>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+              ))
+            )}
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* 10. CUSTOMER TESTIMONIALS */}
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Reviews</span>
-          <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">What Creators Say</h2>
-        </div>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-2">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-secondary">Reviews</span>
+            <h2 className="text-2xl sm:text-4xl font-black text-text-primary dark:text-white">What Creators Say</h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { name: 'Aditya C.', rating: 5, text: 'Absolutely stellar sound quality on the AeroPro headphones. The active noise cancelling blocks out everything. AI Chatbot recommended this to me.', title: 'Amazing Recommendations' },
-            { name: 'Sameer K.', rating: 5, text: 'The Chronos Watch is both premium and super functional. Seamless checkout with my preloaded wallet balance. Delivered within 2 days.', title: 'Express Delivery' },
-            { name: 'Nancy J.', rating: 4, text: 'Clean glassmorphic checkout UI, premium packaging. The hyper-charging GaN adapter works incredibly fast with my MacBook Air.', title: 'Highly Recommend!' }
-          ].map((review, idx) => (
-            <div key={idx} className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 shadow-sm space-y-4">
-              <div className="flex text-amber-500 gap-0.5">
-                {Array.from({ length: review.rating }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { name: 'Aditya C.', rating: 5, text: 'Absolutely stellar sound quality on the AeroPro headphones. The active noise cancelling blocks out everything. AI Chatbot recommended this to me.', title: 'Amazing Recommendations' },
+              { name: 'Sameer K.', rating: 5, text: 'The Chronos Watch is both premium and super functional. Seamless checkout with my preloaded wallet balance. Delivered within 2 days.', title: 'Express Delivery' },
+              { name: 'Nancy J.', rating: 4, text: 'Clean glassmorphic checkout UI, premium packaging. The hyper-charging GaN adapter works incredibly fast with my MacBook Air.', title: 'Highly Recommend!' }
+            ].map((review, idx) => (
+              <div key={idx} className="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 shadow-sm space-y-4">
+                <div className="flex text-amber-500 gap-0.5">
+                  {Array.from({ length: review.rating }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-current" />
+                  ))}
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-bold text-sm text-text-primary dark:text-white">{review.title}</h4>
+                  <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">&ldquo;{review.text}&rdquo;</p>
+                </div>
+                <div className="font-bold text-xs text-text-primary dark:text-slate-200 pt-2">{review.name}</div>
               </div>
-              <div className="space-y-2">
-                <h4 className="font-bold text-sm text-text-primary dark:text-white">{review.title}</h4>
-                <p className="text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">&ldquo;{review.text}&rdquo;</p>
-              </div>
-              <div className="font-bold text-xs text-text-primary dark:text-slate-200 pt-2">{review.name}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+      </ScrollReveal>
 
       {/* 11. FREQUENTLY ASKED QUESTIONS (FAQ) */}
-      <section className="mx-auto max-w-4xl px-4 sm:px-6 space-y-8">
-        <div className="text-center space-y-2">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-primary">FAQ</span>
-          <h2 className="text-2xl sm:text-3xl font-black text-text-primary dark:text-white">Got Questions?</h2>
-        </div>
+      <ScrollReveal delay={0.1}>
+        <section className="mx-auto max-w-4xl px-4 sm:px-6 space-y-8">
+          <div className="text-center space-y-2">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-primary">FAQ</span>
+            <h2 className="text-2xl sm:text-3xl font-black text-text-primary dark:text-white">Got Questions?</h2>
+          </div>
 
-        <div className="space-y-4">
-          {faqs.map((faq, idx) => {
-            const isOpen = openFaqIdx === idx;
-            return (
-              <div 
-                key={idx} 
-                className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 rounded-2xl overflow-hidden transition-all"
-              >
-                <button
-                  onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
-                  className="w-full flex items-center justify-between p-5 text-left font-extrabold text-xs text-text-primary dark:text-white cursor-pointer"
+          <div className="space-y-4">
+            {faqs.map((faq, idx) => {
+              const isOpen = openFaqIdx === idx;
+              return (
+                <div 
+                  key={idx} 
+                  className="bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-white/5 rounded-2xl overflow-hidden transition-all"
                 >
-                  <span>{faq.q}</span>
-                  <ChevronDown className={`w-4.5 h-4.5 text-text-secondary transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {isOpen && (
-                  <div className="px-5 pb-5 text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
-                    {faq.a}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
+                  <button
+                    onClick={() => setOpenFaqIdx(isOpen ? null : idx)}
+                    className="w-full flex items-center justify-between p-5 text-left font-extrabold text-xs text-text-primary dark:text-white cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <ChevronDown className={`w-4.5 h-4.5 text-text-secondary transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {isOpen && (
+                    <div className="px-5 pb-5 text-xs text-text-secondary dark:text-slate-400 leading-relaxed font-medium">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      </ScrollReveal>
     </div>
   );
 }

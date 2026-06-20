@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import API from '../../utils/api';
 import { ProductCard } from '../../components/ProductCard';
+import { ProductImage } from '../../components/ProductImage';
 import { GitCompare, Sparkles, X, SlidersHorizontal, ArrowLeftRight, Grid, List, RefreshCw } from 'lucide-react';
 import { Product, Category } from '../../../../shared/types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -373,13 +374,13 @@ function ProductCatalogContent() {
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   <AnimatePresence>
-                    {products.map((prod) => (
+                    {products.map((prod, idx) => (
                       <motion.div
                         key={prod._id}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.98 }}
+                        transition={{ duration: 0.5, delay: (idx % 9) * 0.05, ease: [0.16, 1, 0.3, 1] }}
                       >
                         <ProductCard
                           product={prod}
@@ -393,8 +394,10 @@ function ProductCatalogContent() {
               ) : (
                 <div className="space-y-4">
                   {products.map((prod) => (
-                    <div key={prod._id} className="flex flex-col sm:flex-row bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-4 rounded-3xl gap-6 items-center shadow-md hover:shadow-xl transition-all">
-                      <img src={prod.images[0]} className="w-40 h-40 object-cover rounded-2xl bg-slate-100 dark:bg-slate-950 flex-shrink-0" />
+                    <div key={prod._id} className="flex flex-col sm:flex-row bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-white/5 p-4 rounded-3xl gap-6 items-center shadow-md hover:shadow-xl transition-all w-full">
+                      <div className="w-40 h-40 overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-950 flex-shrink-0">
+                        <ProductImage src={prod.images[0]} alt={prod.name} />
+                      </div>
                       <div className="flex-1 space-y-2 text-center sm:text-left">
                         <h3 className="text-lg font-bold text-text-primary dark:text-white">{prod.name}</h3>
                         <p className="text-xs text-text-secondary dark:text-slate-400 line-clamp-2 leading-relaxed">{prod.description}</p>
@@ -472,7 +475,9 @@ function ProductCatalogContent() {
               <div className="flex gap-2">
                 {compareList.map((p) => (
                   <div key={p._id} className="flex-1 bg-slate-50 dark:bg-slate-900 p-2.5 rounded-2xl border border-slate-200/50 dark:border-white/5 relative flex items-center gap-2">
-                    <img src={p.images[0]} className="w-8 h-8 object-cover rounded bg-slate-900 flex-shrink-0" />
+                    <div className="w-8 h-8 rounded overflow-hidden bg-slate-900 flex-shrink-0">
+                      <ProductImage src={p.images[0]} alt={p.name} />
+                    </div>
                     <span className="text-[10px] font-bold truncate flex-1">{p.name}</span>
                     <button
                       onClick={() => handleCompareSelect(p)}
